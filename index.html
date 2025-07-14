@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ThunderWeb - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">ThunderWeb</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+            <li><a href="{{ url_for('shop') }}">Shop</a></li>
+            <li><a href="{{ url_for('cart') }}">Cart <span id="cart-count" class="cart-badge"></span></a></li>
+            {% if session.username %}
+                <li><a href="#">Welcome, {{ session.username }}!</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <header class="hero">
+        <h1>Welcome to ThunderShopping</h1>
+        <p>Your one-stop shop for the latest laptops and technology</p>
+        <div class="hero-actions">
+            <a href="{{ url_for('shop') }}" class="cta-btn primary">
+                <i class="fas fa-shopping-bag"></i> Shop Now
+            </a>
+            <a href="#categories" class="cta-btn secondary">
+                <i class="fas fa-arrow-down"></i> Explore Categories
+            </a>
+        </div>
+    </header>
+    
+    <section class="categories-section" id="categories">
+        <div class="container">
+            <h2>Find Your Perfect Laptop</h2>
+            <p class="section-subtitle">Discover laptops designed for every lifestyle and profession</p>
+            
+            <div class="categories-grid">
+                <div class="category-card student-card">
+                    <a href="{{ url_for('shop', category='students') }}" class="category-link">
+                        <div class="category-icon">🎓</div>
+                        <h3>For Students</h3>
+                        <p>Affordable, lightweight laptops perfect for studying, research, and everyday tasks. Great battery life and portability for campus life.</p>
+                        <ul class="feature-list">
+                            <li>✓ Budget-friendly options</li>
+                            <li>✓ Long battery life</li>
+                            <li>✓ Lightweight design</li>
+                            <li>✓ Perfect for note-taking</li>
+                        </ul>
+                        <div class="category-cta">
+                            <span class="cta-text">Browse Student Laptops</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="category-card developer-card">
+                    <a href="{{ url_for('shop', category='developers') }}" class="category-link">
+                        <div class="category-icon">💻</div>
+                        <h3>For Coders & Developers</h3>
+                        <p>High-performance laptops with powerful processors, ample RAM, and excellent keyboards for coding marathons and development work.</p>
+                        <ul class="feature-list">
+                            <li>✓ High-performance processors</li>
+                            <li>✓ 16GB+ RAM options</li>
+                            <li>✓ Excellent keyboards</li>
+                            <li>✓ Multiple ports</li>
+                        </ul>
+                        <div class="category-cta">
+                            <span class="cta-text">Browse Developer Laptops</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="category-card gamer-card">
+                    <a href="{{ url_for('shop', category='gamers') }}" class="category-link">
+                        <div class="category-icon">🎮</div>
+                        <h3>For Gamers</h3>
+                        <p>Gaming laptops with dedicated graphics cards, high refresh rate displays, and advanced cooling systems for the ultimate gaming experience.</p>
+                        <ul class="feature-list">
+                            <li>✓ Dedicated GPU</li>
+                            <li>✓ High refresh rate displays</li>
+                            <li>✓ Advanced cooling</li>
+                            <li>✓ RGB lighting</li>
+                        </ul>
+                        <div class="category-cta">
+                            <span class="cta-text">Browse Gaming Laptops</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="category-card professional-card">
+                    <a href="{{ url_for('shop', category='professionals') }}" class="category-link">
+                        <div class="category-icon">💼</div>
+                        <h3>For Professionals</h3>
+                        <p>Business laptops with premium build quality, security features, and professional aesthetics for corporate environments.</p>
+                        <ul class="feature-list">
+                            <li>✓ Premium build quality</li>
+                            <li>✓ Security features</li>
+                            <li>✓ Professional design</li>
+                            <li>✓ Enterprise support</li>
+                        </ul>
+                        <div class="category-cta">
+                            <span class="cta-text">Browse Professional Laptops</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <h2>Why Choose ThunderWeb?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Free Shipping</h3>
+                    <p>Free delivery on all orders above ₹25,000. Fast and secure shipping nationwide.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Warranty Protection</h3>
+                    <p>Comprehensive warranty coverage and extended protection plans available.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Round-the-clock customer support to help you with any questions or issues.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <h3>Easy Returns</h3>
+                    <p>30-day hassle-free return policy. Not satisfied? Get your money back.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <p>&copy; 2025 ThunderWeb. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Update cart count
+        function updateCartCount() {
+            fetch('/api/cart_count')
+                .then(response => response.json())
+                .then(data => {
+                    const cartBadge = document.getElementById('cart-count');
+                    if (data.count > 0) {
+                        cartBadge.textContent = data.count;
+                        cartBadge.style.display = 'inline';
+                    } else {
+                        cartBadge.style.display = 'none';
+                    }
+                });
+        }
+
+        // Update cart count on page load
+        updateCartCount();
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ThunderWeb - Shop</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">ThunderWeb</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('shop') }}" class="active">Shop</a></li>
+            <li><a href="{{ url_for('cart') }}">Cart <span id="cart-count" class="cart-badge"></span></a></li>
+            {% if session.username %}
+                <li><a href="#">Welcome, {{ session.username }}!</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <section class="shop-header">
+        <div class="container">
+            <h1>{{ category_title }}</h1>
+            <p class="shop-subtitle">
+                {% if current_category == 'students' %}
+                    Affordable and reliable laptops perfect for academic success
+                {% elif current_category == 'developers' %}
+                    High-performance machines built for coding and development
+                {% elif current_category == 'gamers' %}
+                    Powerful gaming laptops for the ultimate gaming experience
+                {% elif current_category == 'professionals' %}
+                    Premium business laptops for professional excellence
+                {% else %}
+                    Discover our complete collection of laptops for every need
+                {% endif %}
+            </p>
+            
+            <!-- Search Bar -->
+            <div class="search-container-modern">
+                <form method="get" action="{{ url_for('shop', category=current_category) }}" class="search-form-modern">
+                    <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ search_query }}" 
+                    placeholder="🔍 Search laptops..." 
+                    class="search-input-modern"
+                    >
+                    <button type="submit" class="search-btn-modern">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+<!-- ...existing code... -->
+            
+            <!-- Category Filter Navigation -->
+            <div class="category-filters">
+                <a href="{{ url_for('shop') }}" class="filter-btn {% if not current_category %}active{% endif %}">All Laptops</a>
+                <a href="{{ url_for('shop', category='students') }}" class="filter-btn {% if current_category == 'students' %}active{% endif %}">Students</a>
+                <a href="{{ url_for('shop', category='developers') }}" class="filter-btn {% if current_category == 'developers' %}active{% endif %}">Developers</a>
+                <a href="{{ url_for('shop', category='gamers') }}" class="filter-btn {% if current_category == 'gamers' %}active{% endif %}">Gamers</a>
+                <a href="{{ url_for('shop', category='professionals') }}" class="filter-btn {% if current_category == 'professionals' %}active{% endif %}">Professionals</a>
+            </div>
+        </div>
+    </section>
+    
+    <section class="featured-products">
+        <div class="container">
+            {% if products %}
+                <div class="product-grid">
+                    {% for product in products %}
+                    <div class="product-card">
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-link">
+                            <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}">
+                            <h3>{{ product.name }}</h3>
+                            <p class="product-specs">{{ product.specs }}</p>
+                            <p class="product-description">{{ product.description }}</p>
+                            
+                            {% if product.rating %}
+                            <div class="product-rating">
+                                <div class="stars">
+                                    {% for i in range(5) %}
+                                        {% if i < product.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="rating-text">{{ product.rating }}/5 ({{ product.reviews }})</span>
+                            </div>
+                            {% endif %}
+                            
+                            <p class="price">₹{{ product.price }}</p>
+                        </a>
+                        
+                        <form method="POST" action="{{ url_for('add_to_cart') }}" class="add-to-cart-form">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="add-cart-btn">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-products">
+                    <div class="no-products-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>No products found</h3>
+                    <p>{% if search_query %}No products match your search "{{ search_query }}".{% else %}No products available in this category.{% endif %}</p>
+                    <a href="{{ url_for('shop') }}" class="browse-all-btn">Browse All Products</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+    
+    <footer>
+        <p>&copy; 2025 ThunderWeb. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Update cart count
+        function updateCartCount() {
+            fetch('/api/cart_count')
+                .then(response => response.json())
+                .then(data => {
+                    const cartBadge = document.getElementById('cart-count');
+                    if (data.count > 0) {
+                        cartBadge.textContent = data.count;
+                        cartBadge.style.display = 'inline';
+                    } else {
+                        cartBadge.style.display = 'none';
+                    }
+                });
+        }
+
+        // Update cart count on page load
+        updateCartCount();
+
+        // Update cart count after adding to cart
+        document.querySelectorAll('.add-to-cart-form').forEach(form => {
+            form.addEventListener('submit', function() {
+                setTimeout(updateCartCount, 500);
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+

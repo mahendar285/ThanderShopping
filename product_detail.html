@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.name }} - ThunderWeb</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">ThunderWeb</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('shop') }}">Shop</a></li>
+            <li><a href="{{ url_for('cart') }}">Cart <span id="cart-count" class="cart-badge"></span></a></li>
+            {% if session.username %}
+                <li><a href="#">Welcome, {{ session.username }}!</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="product-detail-container">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">Home</a> > 
+                <a href="{{ url_for('shop', category=product.category) }}">{{ product.category.title() }}</a> > 
+                {{ product.name }}
+            </div>
+
+            <div class="product-detail-grid">
+                <div class="product-image-section">
+                    <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}" class="main-product-image">
+                </div>
+
+                <div class="product-info-section">
+                    <h1 class="product-title">{{ product.name }}</h1>
+                    
+                    <div class="product-rating">
+                        <div class="stars">
+                            {% for i in range(5) %}
+                                {% if i < product.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="rating-text">{{ product.rating }}/5 ({{ product.reviews }} reviews)</span>
+                    </div>
+
+                    <div class="product-price">₹{{ product.price }}</div>
+
+                    <div class="product-specs">
+                        <h3>Specifications</h3>
+                        <p>{{ product.specs }}</p>
+                    </div>
+
+                    <div class="product-description">
+                        <h3>Description</h3>
+                        <p>{{ product.description }}</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('add_to_cart') }}" class="add-to-cart-form">
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <div class="quantity-selector">
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="10">
+                        </div>
+                        <button type="submit" class="add-to-cart-btn-large">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </form>
+
+                    <div class="product-features">
+                        <div class="feature">
+                            <i class="fas fa-shipping-fast"></i>
+                            <span>Free Shipping</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-undo"></i>
+                            <span>30-Day Returns</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>1 Year Warranty</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if related_products %}
+            <div class="related-products-section">
+                <h2>Related Products</h2>
+                <div class="related-products-grid">
+                    {% for related_product in related_products %}
+                    <div class="product-card">
+                        <a href="{{ url_for('product_detail', product_id=related_product.id) }}">
+                            <img src="{{ url_for('static', filename=related_product.image) }}" alt="{{ related_product.name }}">
+                            <h3>{{ related_product.name }}</h3>
+                            <p class="price">₹{{ related_product.price }}</p>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 ThunderWeb. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Update cart count
+        function updateCartCount() {
+            fetch('/api/cart_count')
+                .then(response => response.json())
+                .then(data => {
+                    const cartBadge = document.getElementById('cart-count');
+                    if (data.count > 0) {
+                        cartBadge.textContent = data.count;
+                        cartBadge.style.display = 'inline';
+                    } else {
+                        cartBadge.style.display = 'none';
+                    }
+                });
+        }
+
+        // Update cart count on page load
+        updateCartCount();
+    </script>
+</body>
+</html>
