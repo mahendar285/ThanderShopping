@@ -1,5 +1,3 @@
-# ThanderShopping
-# ThanderShopping
 
 # ThunderShopping Web Application
 
